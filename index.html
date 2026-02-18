@@ -1,137 +1,189 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neural AGI Workspace v3</title>
-
-<!-- Marked.js for markdown -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<!-- Prism.js for syntax highlighting -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-
+<title>AI Chatbot - OpenRouter</title>
 <style>
-body{ margin:0; background:#0b0f14; color:#eaeaea; font-family:Inter,sans-serif; display:flex; height:100vh;}
-.sidebar{ width:260px; background:#11161c; padding:20px; display:flex; flex-direction:column; border-right:1px solid rgba(255,255,255,0.05);}
-.sidebar h2{ margin:0 0 20px; }
-.sidebar button{ background:#1b232d; border:none; color:white; padding:10px; margin-bottom:10px; border-radius:8px; cursor:pointer;}
-.sidebar button:hover{ background:#243041; }
-.main{ flex:1; display:flex; flex-direction:column; }
-.chat{ flex:1; overflow-y:auto; padding:30px; }
-.message{ margin-bottom:20px; line-height:1.6; white-space:pre-wrap; }
-.user{ color:#9aa0a6; text-align:right; }
-.ai{ color:#6bbcff; }
-.input-area{ padding:20px; border-top:1px solid rgba(255,255,255,0.05);}
-.input-box{ display:flex; background:#1b232d; border-radius:30px; padding:10px 20px;}
-input{ flex:1; background:none; border:none; color:white; font-size:16px; outline:none;}
-button.send{ background:#2979ff; border:none; color:white; padding:8px 15px; border-radius:20px; cursor:pointer;}
-button.send:hover{ background:#3a86ff; }
+  body { font-family: Arial, sans-serif; background-color: #f4f4f4; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 0; }
+  #chat-container { width: 90%; max-width: 600px; background: #fff; border-radius: 8px; padding: 20px; margin-top: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  #messages { height: 400px; overflow-y: auto; border: 1px solid #ccc; border-radius: 8px; padding: 10px; margin-bottom: 10px; background: #f9f9f9; }
+  .message { padding: 8px 12px; margin: 5px 0; border-radius: 5px; max-width: 80%; }
+  .user { background-color: #007bff; color: #fff; align-self: flex-end; }
+  .bot { background-color: #e2e2e2; color: #000; align-self: flex-start; }
+  #input-container { display: flex; gap: 10px; }
+  input, select, button { padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+  button { cursor: pointer; background-color: #007bff; color: #fff; border: none; }
+  button:hover { background-color: #0056b3; }
 </style>
 </head>
-
 <body>
-<div class="sidebar">
-  <h2>Neural AGI v3</h2>
-  <button onclick="newChat()">New Chat</button>
-  <button onclick="toggleAgent()">Toggle Agent</button>
-  <button onclick="toggleReflection()">Toggle Reflection</button>
-  <button onclick="toggleStreaming()">Toggle Streaming</button>
-  <button onclick="openSettings()">API / Model</button>
-</div>
 
-<div class="main">
-  <div id="chat" class="chat"></div>
-  <div class="input-area">
-    <div class="input-box">
-      <input id="input" placeholder="Engage Neural Core..." />
-      <button class="send" onclick="send()">Send</button>
-    </div>
+<div id="chat-container">
+  <h2>AI Chatbot</h2>
+  <div>
+    <label for="model-select">Select Model:</label>
+    <select id="model-select">
+      <option value="gpt-4">GPT-4</option>
+      <option value="gpt-3.5">GPT-3.5</option>
+      <option value="claude-2">Claude 2</option>
+    </select>
+  </div>
+  <div id="messages"></div>
+  <div id="input-container">
+    <input type="text" id="user-input" placeholder="Type your message here..." />
+    <button id="send-btn">Send</button>
   </div>
 </div>
 
 <script>
-let apiKey = localStorage.getItem("apiKey");
-let model = localStorage.getItem("model") || "openai/gpt-4o-mini";
-let agentMode = true;
-let reflectionMode = true;
-let streamingMode = true;
-let memory = JSON.parse(localStorage.getItem("memory") || "[]");
+const messagesContainer = document.getElementById('messages');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const modelSelect = document.getElementById('model-select');
 
-function saveMemory(){ localStorage.setItem("memory", JSON.stringify(memory)); }
-function openSettings(){
-  const newKey = prompt("Enter OpenRouter API Key:", apiKey||"");
-  const newModel = prompt("Enter Model:", model);
-  if(newKey){ apiKey=newKey; localStorage.setItem("apiKey",apiKey); }
-  if(newModel){ model=newModel; localStorage.setItem("model",model); }
-}
-if(!apiKey){ openSettings(); }
+const API_KEY = "YOUR_OPENROUTER_API_KEY"; // Replace with your OpenRouter API Key
+const API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-function toggleAgent(){ agentMode=!agentMode; alert("Agent: "+(agentMode?"ON":"OFF")); }
-function toggleReflection(){ reflectionMode=!reflectionMode; alert("Reflection: "+(reflectionMode?"ON":"OFF")); }
-function toggleStreaming(){ streamingMode=!streamingMode; alert("Streaming: "+(streamingMode?"ON":"OFF")); }
-function newChat(){ document.getElementById("chat").innerHTML=""; memory=[]; saveMemory(); }
-
-function addMessage(html,type){
-  const div=document.createElement("div");
-  div.className="message "+type;
-  div.innerHTML=marked.parse(html);
-  document.getElementById("chat").appendChild(div);
-  Prism.highlightAll();
-  document.getElementById("chat").scrollTop=document.getElementById("chat").scrollHeight;
-  return div;
+function addMessage(text, sender) {
+  const msgDiv = document.createElement('div');
+  msgDiv.textContent = text;
+  msgDiv.className = 'message ' + sender;
+  messagesContainer.appendChild(msgDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-async function callModel(messages,stream=false){
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions",{
-    method:"POST",
-    headers:{ "Authorization":"Bearer "+apiKey, "Content-Type":"application/json" },
-    body:JSON.stringify({ model:model, messages:messages, temperature:0.7, stream:stream })
-  });
-  if(!response.ok) throw new Error("API Error");
-  const data = await response.json();
-  return data.choices[0].message.content;
+async function sendMessage() {
+  const message = userInput.value.trim();
+  if (!message) return;
+
+  addMessage(message, 'user');
+  userInput.value = '';
+  const model = modelSelect.value;
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: "user", content: message }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    const data = await response.json();
+
+    // Extract bot message
+    const botMessage = data?.choices?.[0]?.message?.content || "No response from model.";
+    addMessage(botMessage, 'bot');
+
+  } catch (error) {
+    console.error(error);
+    addMessage("Error: " + error.message, 'bot');
+  }
 }
 
-async function send(){
-  const input=document.getElementById("input");
-  const text=input.value.trim();
-  if(!text || !apiKey) return;
-  input.value="";
-  addMessage(text,"user");
-  memory.push({role:"user",content:text});
-  saveMemory();
-  const aiDiv=addMessage("Thinking...","ai");
-
-  try{
-    let systemPrompt = "You are a futuristic multi-agent AI. Plan, reason, and solve tasks step-by-step.";
-
-    if(agentMode){ systemPrompt+=" Internal planner active."; }
-    let messages=[{role:"system",content:systemPrompt}, ...memory];
-
-    // Main response
-    let reply = await callModel(messages, streamingMode);
-
-    // Reflection loop
-    if(reflectionMode){
-      reply = await callModel([
-        {role:"system",content:"Reflect and improve the following answer for clarity and depth."},
-        {role:"user",content:reply}
-      ]);
-    }
-
-    aiDiv.innerHTML = marked.parse(reply);
-    Prism.highlightAll();
-    memory.push({role:"assistant",content:reply});
-    saveMemory();
-
-  }catch(err){ aiDiv.textContent="Error: "+err.message; }
-}
-
-document.getElementById("input").addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
-
-// Render old memory on load
-memory.forEach(msg=>{ addMessage(msg.content,msg.role==="user"?"user":"ai"); });
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 </script>
+
+</bo<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chatbot - OpenRouter</title>
+<style>
+  body { font-family: Arial, sans-serif; background-color: #f4f4f4; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 0; }
+  #chat-container { width: 90%; max-width: 600px; background: #fff; border-radius: 8px; padding: 20px; margin-top: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  #messages { height: 400px; overflow-y: auto; border: 1px solid #ccc; border-radius: 8px; padding: 10px; margin-bottom: 10px; background: #f9f9f9; }
+  .message { padding: 8px 12px; margin: 5px 0; border-radius: 5px; max-width: 80%; }
+  .user { background-color: #007bff; color: #fff; align-self: flex-end; }
+  .bot { background-color: #e2e2e2; color: #000; align-self: flex-start; }
+  #input-container { display: flex; gap: 10px; }
+  input, select, button { padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+  button { cursor: pointer; background-color: #007bff; color: #fff; border: none; }
+  button:hover { background-color: #0056b3; }
+</style>
+</head>
+<body>
+
+<div id="chat-container">
+  <h2>AI Chatbot</h2>
+  <div>
+    <label for="model-select">Select Model:</label>
+    <select id="model-select">
+      <option value="gpt-4">GPT-4</option>
+      <option value="gpt-3.5">GPT-3.5</option>
+      <option value="claude-2">Claude 2</option>
+    </select>
+  </div>
+  <div id="messages"></div>
+  <div id="input-container">
+    <input type="text" id="user-input" placeholder="Type your message here..." />
+    <button id="send-btn">Send</button>
+  </div>
+</div>
+
+<script>
+const messagesContainer = document.getElementById('messages');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const modelSelect = document.getElementById('model-select');
+
+const API_KEY = "YOUR_OPENROUTER_API_KEY"; // Replace with your OpenRouter API Key
+const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+function addMessage(text, sender) {
+  const msgDiv = document.createElement('div');
+  msgDiv.textContent = text;
+  msgDiv.className = 'message ' + sender;
+  messagesContainer.appendChild(msgDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+async function sendMessage() {
+  const message = userInput.value.trim();
+  if (!message) return;
+
+  addMessage(message, 'user');
+  userInput.value = '';
+  const model = modelSelect.value;
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: "user", content: message }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    const data = await response.json();
+
+    // Extract bot message
+    const botMessage = data?.choices?.[0]?.message?.content || "No response from model.";
+    addMessage(botMessage, 'bot');
+
+  } catch (error) {
+    console.error(error);
+    addMessage("Error: " + error.message, 'bot');
+  }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+</script>
+
 </body>
+</html>dy>
 </html>
