@@ -3,219 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOMMA – Quantum Intelligence Interface</title>
+    <title>GOMMA AI – Powered by Gemini</title>
     <style>
+        :root {
+            --bg: radial-gradient(circle at center, #0f2027, #05080f);
+            --container: rgba(0, 15, 30, 0.9);
+            --accent: #00fff2;
+            --text: #e0ffff;
+        }
+
         body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at center, #0f2027, #05080f);
-            color: #00fff2;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        /* Animated background grid */
-        body::before {
-            content: "";
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background-image: 
-                linear-gradient(rgba(0,255,255,0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: moveGrid 20s linear infinite;
-            z-index: 0;
-        }
-
-        @keyframes moveGrid {
-            from { transform: translate(0, 0); }
-            to { transform: translate(-50px, -50px); }
+            margin: 0; font-family: 'Segoe UI', sans-serif;
+            background: var(--bg); color: var(--text);
+            height: 100vh; display: flex; justify-content: center; align-items: center;
         }
 
         .chat-container {
-            position: relative;
-            z-index: 1;
-            width: 90%;
-            max-width: 800px;
-            background: rgba(0, 20, 40, 0.85);
-            border: 1px solid #00fff2;
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(0, 255, 242, 0.3);
-            backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
-            height: 85vh;
+            width: 95%; max-width: 900px; height: 85vh;
+            background: var(--container); border: 1px solid var(--accent);
+            border-radius: 15px; display: flex; flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 255, 242, 0.2); position: relative;
         }
 
-        .header {
-            padding: 20px;
-            text-align: center;
-            font-size: 1.5em;
-            border-bottom: 1px solid #00fff2;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
+        .header { padding: 15px; text-align: center; border-bottom: 1px solid var(--accent); font-weight: bold; letter-spacing: 2px; }
 
-        .messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            scrollbar-width: thin;
-            scrollbar-color: #00fff2 transparent;
-        }
+        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 
-        .message {
-            margin-bottom: 15px;
-            padding: 12px 18px;
-            border-radius: 15px;
-            max-width: 80%;
-            line-height: 1.4;
-            animation: fadeIn 0.3s ease-out;
-            word-wrap: break-word;
-        }
+        .msg { padding: 12px 16px; border-radius: 10px; max-width: 85%; line-height: 1.5; font-size: 0.95rem; }
+        .user-msg { align-self: flex-end; background: rgba(0, 255, 242, 0.1); border: 1px solid var(--accent); }
+        .ai-msg { align-self: flex-start; background: rgba(255, 255, 255, 0.05); border: 1px solid #444; color: #fff; }
 
-        .user {
-            background: rgba(0, 255, 242, 0.1);
-            align-self: flex-end;
-            border: 1px solid #00fff2;
-            color: #fff;
-        }
-
-        .ai {
-            background: rgba(0, 179, 255, 0.1);
-            align-self: flex-start;
-            border: 1px solid #00b3ff;
-            color: #00fff2;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .input-area {
-            display: flex;
-            border-top: 1px solid #00fff2;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-        }
-
-        input {
-            flex: 1;
-            padding: 20px;
-            border: none;
-            outline: none;
-            background: transparent;
-            color: #00fff2;
-            font-size: 1em;
-        }
-
-        button {
-            padding: 0 30px;
-            background: #00fff2;
-            color: #05080f;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            text-transform: uppercase;
-        }
-
-        button:hover {
-            background: #fff;
-            box-shadow: 0 0 15px #00fff2;
-        }
-
-        .footer {
-            text-align: center;
-            font-size: 0.75em;
-            padding: 10px;
-            opacity: 0.6;
-            letter-spacing: 1px;
-        }
+        .input-area { display: flex; padding: 15px; border-top: 1px solid #222; gap: 10px; }
+        input { flex: 1; background: #000; border: 1px solid var(--accent); color: white; padding: 12px; border-radius: 5px; outline: none; }
+        button { background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        /* Loading animation */
+        .typing { font-size: 0.8em; color: var(--accent); display: none; margin-bottom: 10px; margin-left: 20px; }
     </style>
 </head>
 <body>
 
 <div class="chat-container">
-    <div class="header">
-        GOMMA – Intelligence Interface
+    <div class="header">GOMMA NEURAL INTERFACE</div>
+    <div class="messages" id="chatBox">
+        <div class="msg ai-msg">Gomma Online. Connection Secure. How can I assist your evolution?</div>
     </div>
-    <div class="messages" id="messages">
-        <div class="message ai">
-            Greetings. I am Gomma. My neural pathways are primed. How shall we collaborate today?
-        </div>
-    </div>
+    <div id="typingIndicator" class="typing">Gomma is thinking...</div>
     <div class="input-area">
-        <input type="text" id="userInput" placeholder="Transmit thought protocol..." autocomplete="off" />
-        <button id="sendBtn">Send</button>
-    </div>
-    <div class="footer">
-        Neural Link: STABLE • Node: GOMMA-4126 • System: ACTIVE
+        <input type="text" id="userInput" placeholder="Ask anything..." autocomplete="off">
+        <button onclick="askGomma()">SEND</button>
     </div>
 </div>
 
 <script>
-    const messagesContainer = document.getElementById("messages");
+    // PASTE YOUR API KEY HERE
+    const API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+    const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
-    const sendBtn = document.getElementById("sendBtn");
+    const typingIndicator = document.getElementById("typingIndicator");
 
-    function addMessage(text, type) {
-        const msg = document.createElement("div");
-        msg.classList.add("message", type);
-        msg.textContent = text;
-        messagesContainer.appendChild(msg);
-        
-        // Auto-scroll to bottom
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
+    async function askGomma() {
+        const prompt = userInput.value.trim();
+        if (!prompt) return;
 
-    function generateGommaResponse(input) {
-        const text = input.toLowerCase();
-        
-        if (text.includes("who are you")) {
-            return "I am Gomma, an adaptive AI collaborator. Think of me as a bridge between your intent and the digital vastness.";
-        }
-        if (text.includes("future")) {
-            return "The future is a series of probabilities. Currently, your interaction is shifting the curve toward enlightenment.";
-        }
-        if (text.includes("help")) {
-            return "I can assist with code, creative synthesis, or complex problem solving. What is our primary objective?";
-        }
-        if (text.includes("hello") || text.includes("hi")) {
-            return "Connection established. Ready for input.";
-        }
-
-        return "Query processed. I'm analyzing the parameters of that thought—tell me more.";
-    }
-
-    function handleSend() {
-        const text = userInput.value.trim();
-        if (text === "") return;
-
-        addMessage(text, "user");
+        // 1. Add User Message
+        appendMessage(prompt, "user-msg");
         userInput.value = "";
+        typingIndicator.style.display = "block";
 
-        // Simulated processing delay
-        setTimeout(() => {
-            const response = generateGommaResponse(text);
-            addMessage(response, "ai");
-        }, 700);
+        try {
+            // 2. Call Gemini API
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+
+            const data = await response.json();
+            const aiResponse = data.candidates[0].content.parts[0].text;
+
+            // 3. Add AI Message
+            appendMessage(aiResponse, "ai-msg");
+        } catch (error) {
+            appendMessage("Error: Connection lost. Ensure your API key is correct.", "ai-msg");
+            console.error(error);
+        } finally {
+            typingIndicator.style.display = "none";
+        }
     }
 
-    sendBtn.addEventListener("click", handleSend);
+    function appendMessage(text, className) {
+        const div = document.createElement("div");
+        div.className = `msg ${className}`;
+        div.innerText = text;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-    userInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") handleSend();
-    });
+    userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") askGomma(); });
 </script>
 
 </body>
