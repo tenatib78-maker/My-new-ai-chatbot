@@ -3,108 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOMMA AI – Powered by Gemini</title>
+    <title>Gomma AI – Advanced Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,fill,GRAD@24,400,0,0" />
     <style>
         :root {
-            --bg: radial-gradient(circle at center, #0f2027, #05080f);
-            --container: rgba(0, 15, 30, 0.9);
-            --accent: #00fff2;
-            --text: #e0ffff;
+            --sidebar-bg: #1e1f20;
+            --main-bg: #131314;
+            --text-main: #e3e3e3;
+            --accent: #8ab4f8;
+            --user-bubble: #2b2c2f;
+            --hover-bg: rgba(255, 255, 255, 0.08);
+        }
+
+        .light-mode {
+            --sidebar-bg: #f0f2f5;
+            --main-bg: #ffffff;
+            --text-main: #1f1f1f;
+            --accent: #1a73e8;
+            --user-bubble: #e9eef6;
+            --hover-bg: rgba(0, 0, 0, 0.05);
         }
 
         body {
-            margin: 0; font-family: 'Segoe UI', sans-serif;
-            background: var(--bg); color: var(--text);
-            height: 100vh; display: flex; justify-content: center; align-items: center;
+            margin: 0; font-family: 'Google Sans', 'Segoe UI', sans-serif;
+            background: var(--main-bg); color: var(--text-main);
+            display: flex; height: 100vh; overflow: hidden; transition: 0.3s;
         }
 
-        .chat-container {
-            width: 95%; max-width: 900px; height: 85vh;
-            background: var(--container); border: 1px solid var(--accent);
-            border-radius: 15px; display: flex; flex-direction: column;
-            box-shadow: 0 0 20px rgba(0, 255, 242, 0.2); position: relative;
+        /* Sidebar Styling */
+        #sidebar {
+            width: 280px; background: var(--sidebar-bg);
+            height: 100%; display: flex; flex-direction: column;
+            transition: 0.3s ease; flex-shrink: 0;
         }
 
-        .header { padding: 15px; text-align: center; border-bottom: 1px solid var(--accent); font-weight: bold; letter-spacing: 2px; }
+        .sidebar-hidden #sidebar { margin-left: -280px; }
 
-        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .sidebar-header {
+            padding: 20px; font-size: 1.4rem; font-weight: 500;
+            display: flex; align-items: center; gap: 10px;
+        }
 
-        .msg { padding: 12px 16px; border-radius: 10px; max-width: 85%; line-height: 1.5; font-size: 0.95rem; }
-        .user-msg { align-self: flex-end; background: rgba(0, 255, 242, 0.1); border: 1px solid var(--accent); }
-        .ai-msg { align-self: flex-start; background: rgba(255, 255, 255, 0.05); border: 1px solid #444; color: #fff; }
+        .nav-list { flex: 1; padding: 10px; overflow-y: auto; }
 
-        .input-area { display: flex; padding: 15px; border-top: 1px solid #222; gap: 10px; }
-        input { flex: 1; background: #000; border: 1px solid var(--accent); color: white; padding: 12px; border-radius: 5px; outline: none; }
-        button { background: var(--accent); color: #000; border: none; padding: 0 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        
-        /* Loading animation */
-        .typing { font-size: 0.8em; color: var(--accent); display: none; margin-bottom: 10px; margin-left: 20px; }
+        .nav-item {
+            padding: 12px 16px; cursor: pointer; display: flex; align-items: center;
+            gap: 12px; border-radius: 25px; transition: 0.2s;
+            font-size: 0.95rem; margin-bottom: 4px;
+        }
+        .nav-item:hover { background: var(--hover-bg); }
+        .nav-item i { font-size: 20px; }
+
+        .sidebar-footer { padding: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* Main Area */
+        #main-content { flex: 1; display: flex; flex-direction: column; position: relative; }
+
+        .top-nav { padding: 10px 20px; display: flex; align-items: center; gap: 15px; }
+
+        .chat-window {
+            flex: 1; overflow-y: auto; padding: 20px 15% 150px 15%;
+            display: flex; flex-direction: column; gap: 40px;
+        }
+
+        .user-row { align-self: flex-end; max-width: 85%; }
+        .user-bubble { background: var(--user-bubble); padding: 15px 20px; border-radius: 22px; }
+
+        .ai-row { align-self: flex-start; width: 100%; display: flex; gap: 15px; }
+        .ai-content { flex: 1; line-height: 1.7; }
+
+        /* Settings Icon Specifics */
+        .settings-trigger {
+            cursor: pointer; display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 25px; width: 100%;
+            background: none; border: none; color: inherit; font-size: inherit;
+        }
+        .settings-trigger:hover { background: var(--hover-bg); }
+
+        /* Input Bar */
+        .input-container {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 80%; max-width: 760px; background: var(--user-bubble);
+            border-radius: 32px; padding: 8px 20px; display: flex; align-items: center;
+        }
+
+        input {
+            flex: 1; background: transparent; border: none; color: inherit;
+            padding: 12px; outline: none; font-size: 1rem;
+        }
+
+        /* Modal */
+        #settingsModal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: var(--sidebar-bg); border: 1px solid #444;
+            padding: 25px; border-radius: 20px; z-index: 1000; display: none; width: 320px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
-<body>
+<body class="sidebar-visible">
 
-<div class="chat-container">
-    <div class="header">GOMMA NEURAL INTERFACE</div>
-    <div class="messages" id="chatBox">
-        <div class="msg ai-msg">Gomma Online. Connection Secure. How can I assist your evolution?</div>
+<div id="sidebar">
+    <div class="sidebar-header">
+        <span class="material-symbols-rounded">rocket_launch</span> Gomma AI
     </div>
-    <div id="typingIndicator" class="typing">Gomma is thinking...</div>
-    <div class="input-area">
-        <input type="text" id="userInput" placeholder="Ask anything..." autocomplete="off">
-        <button onclick="askGomma()">SEND</button>
+    
+    <div class="nav-list">
+        <div class="nav-item" onclick="resetChat()">
+            <span class="material-symbols-rounded">add</span> New Chat
+        </div>
+        <div style="margin-top: 20px; padding: 0 16px; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase;">Recent</div>
+        <div class="nav-item"><span class="material-symbols-rounded">chat_bubble</span> Project Brainstorm</div>
+    </div>
+
+    <div class="sidebar-footer">
+        <button class="settings-trigger" onclick="toggleModal()">
+            <span class="material-symbols-rounded">settings</span> Settings
+        </button>
     </div>
 </div>
 
-<script>
-    // PASTE YOUR API KEY HERE
-    const API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+<div id="main-content">
+    <div class="top-nav">
+        <button onclick="document.body.classList.toggle('sidebar-hidden')" style="background:none; border:none; color:inherit; cursor:pointer;">
+            <span class="material-symbols-rounded">menu</span>
+        </button>
+        <div id="activeBotName" style="font-weight: 500;">Gomma Pro</div>
+    </div>
 
-    const chatBox = document.getElementById("chatBox");
-    const userInput = document.getElementById("userInput");
-    const typingIndicator = document.getElementById("typingIndicator");
+    <div class="chat-window" id="chatBox">
+        <div class="ai-row">
+            <span class="material-symbols-rounded" style="color:var(--accent)">smart_toy</span>
+            <div class="ai-content">Ready for your next request. What shall we build together?</div>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="userInput" placeholder="Message Gomma...">
+        <button onclick="askGomma()" style="background:none; border:none; color:var(--accent); cursor:pointer;">
+            <span class="material-symbols-rounded">send</span>
+        </button>
+    </div>
+</div>
+
+<div id="settingsModal">
+    <h3 style="margin-top:0">Settings</h3>
+    <p>Display Name</p>
+    <input type="text" id="nameInput" style="width:90%; padding:10px; background:#000; border:1px solid #444; color:white; border-radius:8px;">
+    
+    <p>Theme</p>
+    <select id="themeInput" style="width:100%; padding:10px; border-radius:8px;">
+        <option value="dark">Dark Theme</option>
+        <option value="light">Light Theme</option>
+    </select>
+    
+    <button onclick="saveSettings()" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:10px; margin-top:20px; cursor:pointer; font-weight:bold;">Save Changes</button>
+    <button onclick="toggleModal()" style="width:100%; padding:12px; background:transparent; color:white; border:none; cursor:pointer;">Cancel</button>
+</div>
+
+<script>
+    const API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+    let history = [];
+    let config = JSON.parse(localStorage.getItem('gomma_v3')) || { name: "Gomma Pro", theme: "dark" };
+
+    function applyConfig() {
+        document.getElementById('activeBotName').innerText = config.name;
+        document.body.className = config.theme === 'light' ? 'light-mode' : '';
+        document.getElementById('nameInput').value = config.name;
+        document.getElementById('themeInput').value = config.theme;
+    }
 
     async function askGomma() {
-        const prompt = userInput.value.trim();
-        if (!prompt) return;
+        const text = document.getElementById('userInput').value.trim();
+        if (!text || API_KEY.includes("YOUR")) return;
 
-        // 1. Add User Message
-        appendMessage(prompt, "user-msg");
-        userInput.value = "";
-        typingIndicator.style.display = "block";
+        appendMsg(text, 'user');
+        document.getElementById('userInput').value = "";
+        history.push({ role: "user", parts: [{ text: text }] });
 
         try {
-            // 2. Call Gemini API
-            const response = await fetch(API_URL, {
+            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
+                body: JSON.stringify({ contents: history })
             });
-
-            const data = await response.json();
-            const aiResponse = data.candidates[0].content.parts[0].text;
-
-            // 3. Add AI Message
-            appendMessage(aiResponse, "ai-msg");
-        } catch (error) {
-            appendMessage("Error: Connection lost. Ensure your API key is correct.", "ai-msg");
-            console.error(error);
-        } finally {
-            typingIndicator.style.display = "none";
+            const data = await resp.json();
+            const aiText = data.candidates[0].content.parts[0].text;
+            
+            history.push({ role: "model", parts: [{ text: aiText }] });
+            appendMsg(aiText, 'ai');
+        } catch (e) {
+            appendMsg("Connection error. Check API settings.", "ai");
         }
     }
 
-    function appendMessage(text, className) {
-        const div = document.createElement("div");
-        div.className = `msg ${className}`;
-        div.innerText = text;
+    function appendMsg(text, type) {
+        const chatBox = document.getElementById('chatBox');
+        const div = document.createElement('div');
+        div.className = type === 'user' ? 'user-row' : 'ai-row';
+        
+        const content = type === 'user' ? 
+            `<div class="user-bubble">${text}</div>` : 
+            `<span class="material-symbols-rounded" style="color:var(--accent)">smart_toy</span><div class="ai-content">${marked.parse(text)}</div>`;
+        
+        div.innerHTML = content;
         chatBox.appendChild(div);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") askGomma(); });
+    function toggleModal() {
+        const m = document.getElementById('settingsModal');
+        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function saveSettings() {
+        config.name = document.getElementById('nameInput').value;
+        config.theme = document.getElementById('themeInput').value;
+        localStorage.setItem('gomma_v3', JSON.stringify(config));
+        applyConfig();
+        toggleModal();
+    }
+
+    function resetChat() {
+        history = [];
+        document.getElementById('chatBox').innerHTML = `<div class="ai-row"><span class="material-symbols-rounded" style="color:var(--accent)">smart_toy</span><div class="ai-content">Chat reset. New session started.</div></div>`;
+    }
+
+    document.getElementById('userInput').addEventListener('keypress', e => { if(e.key === 'Enter') askGomma() });
+    applyConfig();
 </script>
 
 </body>
