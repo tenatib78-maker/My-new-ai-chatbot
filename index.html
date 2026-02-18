@@ -4,12 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Pro Chat</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{
   --bg:#0f172a;
@@ -19,277 +18,199 @@
   --border:#1f2937;
   --text:#e5e7eb;
 }
-
 *{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-  font-family:'Inter',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  display:flex;
-  height:100vh;
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;}
+.sidebar{width:280px;background:var(--panel);padding:20px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:20px;}
+.sidebar h2{font-size:18px;font-weight:600;}
+input,select,button,textarea{padding:10px;border-radius:8px;border:1px solid var(--border);background:#0b1220;color:white;}
+button{background:var(--user);border:none;cursor:pointer;}
+.chat-container{flex:1;display:flex;flex-direction:column;}
+.chat-messages{flex:1;overflow-y:auto;padding:30px;display:flex;flex-direction:column;gap:25px;}
+.message{display:flex;gap:15px;max-width:900px;}
+.avatar{width:35px;height:35px;border-radius:50%;background:#374151;display:flex;align-items:center;justify-content:center;font-weight:600;}
+.bubble{padding:15px;border-radius:12px;background:var(--assistant);width:100%;position:relative;overflow-wrap:break-word;}
+.user .bubble{background:var(--user);}
+.chat-input{padding:20px;border-top:1px solid var(--border);display:flex;gap:10px;}
+textarea{flex:1;resize:none;height:60px;}
+.typing{opacity:0.6;font-style:italic;}
+/* Graphical text */
+.bubble h1, .bubble h2, .bubble h3{
+  background: linear-gradient(90deg,#2563eb,#06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
-
-.sidebar{
-  width:280px;
-  background:var(--panel);
-  padding:20px;
-  border-right:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-}
-
-.sidebar h2{
-  font-size:18px;
-  font-weight:600;
-}
-
-input,select,button,textarea{
-  padding:10px;
+.bubble p{line-height:1.7;margin-bottom:8px;}
+.bubble ul{padding-left:20px;}
+.bubble ul li{margin-bottom:6px;position:relative;}
+.bubble ul li::marker{color:#2563eb;}
+.bubble blockquote{
+  border-left:4px solid #2563eb;
+  padding:10px 15px;
+  background: rgba(37,99,235,0.1);
   border-radius:8px;
-  border:1px solid var(--border);
-  background:#0b1220;
-  color:white;
+  margin:10px 0;
 }
-
-button{
-  background:var(--user);
-  border:none;
-  cursor:pointer;
-}
-
-.chat-container{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-}
-
-.chat-messages{
-  flex:1;
-  overflow-y:auto;
-  padding:30px;
-  display:flex;
-  flex-direction:column;
-  gap:25px;
-}
-
-.message{
-  display:flex;
-  gap:15px;
-  max-width:900px;
-}
-
-.avatar{
-  width:35px;
-  height:35px;
-  border-radius:50%;
-  background:#374151;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:600;
-}
-
-.bubble{
-  padding:15px;
-  border-radius:12px;
-  background:var(--assistant);
-  width:100%;
-}
-
-.user .bubble{
-  background:var(--user);
-}
-
-.chat-input{
-  padding:20px;
-  border-top:1px solid var(--border);
-  display:flex;
-  gap:10px;
-}
-
-textarea{
-  flex:1;
-  resize:none;
-  height:60px;
-}
-
-.typing{
-  opacity:0.6;
-  font-style:italic;
-}
+.bubble table{width:100%;border-collapse:collapse;margin-top:10px;}
+.bubble table th, .bubble table td{border:1px solid #374151;padding:8px;}
+.bubble table th{background:#1f2937;}
+.fade-in{animation:fadeIn 0.3s ease forwards;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body>
-
 <div class="sidebar">
   <h2>AI Settings</h2>
-
   <div>
-    <label>OpenRouter API Key</label>
-    <input type="password" id="apiKey">
+    <label>API Key</label>
+    <input type="password" id="apiKey" placeholder="Enter API key">
   </div>
-
   <div>
-    <label>Model</label>
-    <select id="model">
-      <option value="openai/gpt-4o">GPT-4o</option>
-      <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
-      <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
-      <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B</option>
+    <label>Provider</label>
+    <select id="provider">
+      <option value="openrouter">OpenRouter</option>
+      <option value="openai">OpenAI</option>
+      <option value="google">Google AI Studio</option>
     </select>
   </div>
-
+  <div>
+    <label>Model Name</label>
+    <input type="text" id="modelInput" placeholder="e.g. openai/gpt-5.2 or glm-4.5-air">
+  </div>
   <button onclick="clearChat()">Clear Chat</button>
 </div>
-
 <div class="chat-container">
-
   <div class="chat-messages" id="chat"></div>
-
   <div class="chat-input">
     <textarea id="input" placeholder="Message AI..."></textarea>
     <button onclick="sendMessage()">Send</button>
   </div>
-
 </div>
 
 <script>
 let messages = JSON.parse(localStorage.getItem("chat_history")) || [];
 
-function saveChat(){
-  localStorage.setItem("chat_history",JSON.stringify(messages));
+function saveChat(){localStorage.setItem("chat_history",JSON.stringify(messages));}
+
+function enhanceTextFormatting(text){
+  text = text.replace(/\*\*(.*?)\*\*/g,'<span style="color:#06b6d4;font-weight:600;">$1</span>');
+  text = text.replace(/Tip:(.*?)(\n|$)/g,'<blockquote><strong>💡 Tip:</strong>$1</blockquote>');
+  return text;
 }
 
-function renderMarkdown(text){
-  return marked.parse(text);
+function renderContent(text){
+  // Try chart
+  try{
+    const json = JSON.parse(text);
+    if(json.type==="chart"){
+      const canvas=document.createElement("canvas");
+      setTimeout(()=>{
+        new Chart(canvas,{
+          type: json.chartType||"bar",
+          data:{labels:json.labels,datasets:[{label:json.label||"Data",data:json.data,backgroundColor:"rgba(37,99,235,0.6)"}]},
+          options:{
+            responsive:true,
+            plugins:{legend:{labels:{color:"#fff"}}},
+            scales:{x:{ticks:{color:"#fff"}},y:{ticks:{color:"#fff"}}}
+          }
+        });
+      },50);
+      return canvas;
+    }
+    if(json.type==="stats"){
+      const wrapper=document.createElement("div");
+      wrapper.style.display="flex";wrapper.style.gap="15px";wrapper.style.flexWrap="wrap";
+      json.items.forEach(item=>{
+        const card=document.createElement("div");
+        card.style.background="#1f2937";card.style.padding="15px";card.style.borderRadius="12px";card.style.minWidth="120px";
+        card.innerHTML=`<h3 style="color:#2563eb;margin-bottom:5px;">${item.value}</h3><p style="opacity:.7;">${item.label}</p>`;
+        wrapper.appendChild(card);
+      });
+      return wrapper;
+    }
+  }catch(e){}
+  const div=document.createElement("div");
+  div.innerHTML=marked.parse(enhanceTextFormatting(text));
+  return div;
 }
 
 function addMessage(role,content){
-  const chat = document.getElementById("chat");
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "message " + role;
-
-  const avatar = document.createElement("div");
-  avatar.className = "avatar";
-  avatar.innerText = role === "user" ? "U" : "AI";
-
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-  bubble.innerHTML = renderMarkdown(content);
-
-  wrapper.appendChild(avatar);
-  wrapper.appendChild(bubble);
-
+  const chat=document.getElementById("chat");
+  const wrapper=document.createElement("div"); wrapper.className="message "+role;
+  const avatar=document.createElement("div"); avatar.className="avatar"; avatar.innerText=role==="user"?"U":"AI";
+  const bubble=document.createElement("div"); bubble.className="bubble";
+  const rendered=renderContent(content);
+  if(rendered instanceof HTMLElement){bubble.appendChild(rendered);}else{bubble.innerHTML=rendered;}
+  wrapper.appendChild(avatar); wrapper.appendChild(bubble);
   chat.appendChild(wrapper);
-
-  chat.scrollTop = chat.scrollHeight;
-
-  document.querySelectorAll("pre code").forEach(block=>{
-    hljs.highlightElement(block);
-  });
-
+  chat.scrollTop=chat.scrollHeight;
   return bubble;
 }
 
-function loadHistory(){
-  messages.forEach(msg=>{
-    addMessage(msg.role,msg.content);
-  });
-}
+function clearChat(){messages=[];localStorage.removeItem("chat_history");document.getElementById("chat").innerHTML="";}
 
-function clearChat(){
-  messages=[];
-  localStorage.removeItem("chat_history");
-  document.getElementById("chat").innerHTML="";
+class AIClient{
+  constructor(provider,apiKey,model){this.provider=provider;this.apiKey=apiKey;this.model=model;}
+  async send(messages,onChunk){
+    if(this.provider==="openrouter")return this.callOpenRouter(messages,onChunk);
+    if(this.provider==="openai")return this.callOpenAI(messages,onChunk);
+    if(this.provider==="google")return this.callGoogle(messages,onChunk);
+  }
+  async streamResponse(url,headers,body,onChunk){
+    const response=await fetch(url,{method:"POST",headers,body:JSON.stringify(body)});
+    if(!response.ok)throw new Error(await response.text());
+    const reader=response.body.getReader();
+    const decoder=new TextDecoder("utf-8"); let buffer="";
+    while(true){
+      const {done,value}=await reader.read(); if(done)break;
+      buffer+=decoder.decode(value,{stream:true});
+      const lines=buffer.split("\n"); buffer=lines.pop();
+      for(const line of lines){
+        if(!line.trim()||!line.startsWith("data:"))continue;
+        const json=line.replace("data:","").trim();
+        if(json==="[DONE]")return;
+        try{
+          const parsed=JSON.parse(json);
+          const content=parsed.choices?.[0]?.delta?.content||parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+          if(content)onChunk(content);
+        }catch{}
+      }
+    }
+  }
+  callOpenRouter(messages,onChunk){return this.streamResponse("https://openrouter.ai/api/v1/chat/completions",{"Authorization":"Bearer "+this.apiKey,"Content-Type":"application/json"},{model:this.model,messages,stream:true},onChunk);}
+  callOpenAI(messages,onChunk){return this.streamResponse("https://api.openai.com/v1/chat/completions",{"Authorization":"Bearer "+this.apiKey,"Content-Type":"application/json"},{model:this.model,messages,stream:true},onChunk);}
+  callGoogle(messages,onChunk){return this.streamResponse(`https://generativelanguage.googleapis.com/v1beta/models/${this.model}:streamGenerateContent?key=${this.apiKey}`,{"Content-Type":"application/json"},{contents:messages.map(m=>({role:m.role,parts:[{text:m.content}]}))},onChunk);}
 }
 
 async function sendMessage(){
-  const input = document.getElementById("input");
-  const apiKey = document.getElementById("apiKey").value;
-  const model = document.getElementById("model").value;
-
-  if(!apiKey) return alert("Enter API key");
-
-  const text = input.value.trim();
-  if(!text) return;
-
-  addMessage("user",text);
-  messages.push({role:"user",content:text});
-  saveChat();
-
-  input.value="";
-
-  const bubble = addMessage("assistant","_AI is typing..._");
-  bubble.classList.add("typing");
-
+  const input=document.getElementById("input");
+  const apiKey=document.getElementById("apiKey").value;
+  const model=document.getElementById("modelInput").value;
+  const provider=document.getElementById("provider").value;
+  if(!apiKey)return alert("Enter API key");
+  if(!model)return alert("Enter model name");
+  const text=input.value.trim(); if(!text)return;
+  addMessage("user",text); messages.push({role:"user",content:text}); saveChat(); input.value="";
+  const bubble=addMessage("assistant","_Thinking..._"); bubble.classList.add("typing"); bubble.innerHTML=""; bubble.classList.remove("typing");
+  const client=new AIClient(provider,apiKey,model); let fullReply="";
   try{
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions",{
-      method:"POST",
-      headers:{
-        "Authorization":"Bearer "+apiKey,
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        model:model,
-        messages:messages,
-        stream:true
-      })
+    await client.send(messages,chunk=>{
+      fullReply+=chunk;
+      bubble.innerHTML=""; bubble.appendChild(renderContent(fullReply));
+      bubble.classList.add("fade-in");
+      document.getElementById("chat").scrollTop=document.getElementById("chat").scrollHeight;
+      document.querySelectorAll("pre code").forEach(block=>{hljs.highlightElement(block);});
     });
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let fullReply="";
-
-    bubble.innerHTML="";
-    bubble.classList.remove("typing");
-
-    while(true){
-      const {done,value}=await reader.read();
-      if(done) break;
-
-      const chunk = decoder.decode(value);
-      const lines = chunk.split("\n");
-
-      for(let line of lines){
-        if(line.startsWith("data:")){
-          const json=line.replace("data: ","").trim();
-          if(json==="[DONE]") break;
-          try{
-            const parsed=JSON.parse(json);
-            const content=parsed.choices?.[0]?.delta?.content;
-            if(content){
-              fullReply+=content;
-              bubble.innerHTML=renderMarkdown(fullReply);
-              document.getElementById("chat").scrollTop=document.getElementById("chat").scrollHeight;
-              document.querySelectorAll("pre code").forEach(block=>{
-                hljs.highlightElement(block);
-              });
-            }
-          }catch{}
-        }
-      }
-    }
-
-    messages.push({role:"assistant",content:fullReply});
-    saveChat();
-
-  }catch(err){
-    bubble.innerHTML="Error: "+err.message;
-  }
+    messages.push({role:"assistant",content:fullReply}); saveChat();
+  }catch(err){bubble.innerHTML="Error: "+err.message;}
 }
 
 document.getElementById("input").addEventListener("keydown",function(e){
-  if(e.key==="Enter" && !e.shiftKey){
-    e.preventDefault();
-    sendMessage();
-  }
+  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage();}
 });
 
-loadHistory();
+messages.forEach(msg=>{addMessage(msg.role,msg.content);});
 </script>
-
 </body>
-  </html>
+</html>
