@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOMMA – Quantum Intelligence Interface</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #0f2027, #05080f);
+            color: #00fff2;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                linear-gradient(rgba(0,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveGrid 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes moveGrid {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-50px, -50px); }
+        }
+
+        .chat-container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 800px;
+            background: rgba(0, 20, 40, 0.85);
+            border: 1px solid #00fff2;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 242, 0.3);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            height: 85vh;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            border-bottom: 1px solid #00fff2;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            scrollbar-width: thin;
+            scrollbar-color: #00fff2 transparent;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 15px;
+            max-width: 80%;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease-out;
+            word-wrap: break-word;
+        }
+
+        .user {
+            background: rgba(0, 255, 242, 0.1);
+            align-self: flex-end;
+            border: 1px solid #00fff2;
+            color: #fff;
+        }
+
+        .ai {
+            background: rgba(0, 179, 255, 0.1);
+            align-self: flex-start;
+            border: 1px solid #00b3ff;
+            color: #00fff2;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-area {
+            display: flex;
+            border-top: 1px solid #00fff2;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        input {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #00fff2;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 0 30px;
+            background: #00fff2;
+            color: #05080f;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #fff;
+            box-shadow: 0 0 15px #00fff2;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 0.75em;
+            padding: 10px;
+            opacity: 0.6;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="header">
+        GOMMA – Intelligence Interface
+    </div>
+    <div class="messages" id="messages">
+        <div class="message ai">
+            Greetings. I am Gomma. My neural pathways are primed. How shall we collaborate today?
+        </div>
+    </div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Transmit thought protocol..." autocomplete="off" />
+        <button id="sendBtn">Send</button>
+    </div>
+    <div class="footer">
+        Neural Link: STABLE • Node: GOMMA-4126 • System: ACTIVE
+    </div>
+</div>
+
+<script>
+    const messagesContainer = document.getElementById("messages");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function addMessage(text, type) {
+        const msg = document.createElement("div");
+        msg.classList.add("message", type);
+        msg.textContent = text;
+        messagesContainer.appendChild(msg);
+        
+        // Auto-scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function generateGommaResponse(input) {
+        const text = input.toLowerCase();
+        
+        if (text.includes("who are you")) {
+            return "I am Gomma, an adaptive AI collaborator. Think of me as a bridge between your intent and the digital vastness.";
+        }
+        if (text.includes("future")) {
+            return "The future is a series of probabilities. Currently, your interaction is shifting the curve toward enlightenment.";
+        }
+        if (text.includes("help")) {
+            return "I can assist with code, creative synthesis, or complex problem solving. What is our primary objective?";
+        }
+        if (text.includes("hello") || text.includes("hi")) {
+            return "Connection established. Ready for input.";
+        }
+
+        return "Query processed. I'm analyzing the parameters of that thought—tell me more.";
+    }
+
+    function handleSend() {
+        const text = userInput.value.trim();
+        if (text === "") return;
+
+        addMessage(text, "user");
+        userInput.value = "";
+
+        // Simulated processing delay
+        setTimeout(() => {
+            const response = generateGommaResponse(text);
+            addMessage(response, "ai");
+        }, 700);
+    }
+
+    sendBtn.addEventListener("click", handleSend);
+
+    userInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") handleSend();
+    });
+</script>
+
+</body>
+</html>
