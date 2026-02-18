@@ -1,239 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini | Official 2026 Workspace</title>
-    <style>
-        :root {
-            --google-gray-900: #131314;
-            --google-gray-800: #1e1f20;
-            --google-blue: #1a73e8;
-            --gemini-aura: linear-gradient(135deg, #4285f4, #9b72cb, #d96570);
-            --border: rgba(255, 255, 255, 0.1);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural AGI Workspace v3</title>
 
-        body, html {
-            margin: 0; padding: 0;
-            background: #0b0d11;
-            color: #e3e3e3;
-            font-family: 'Google Sans', 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-        }
+<!-- Marked.js for markdown -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- Prism.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 
-        /* --- OFFICIAL 2026 SIDEBAR --- */
-        aside#gemini-sidebar {
-            width: 300px;
-            background: var(--google-gray-900);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .sidebar-header {
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .gemini-logo {
-            width: 24px;
-            filter: drop-shadow(0 0 5px rgba(66, 133, 244, 0.5));
-        }
-
-        .workspace-status {
-            margin: 0 20px 20px;
-            padding: 12px;
-            background: rgba(138, 180, 248, 0.08);
-            border-radius: 12px;
-            font-size: 0.75rem;
-            color: #8ab4f8;
-            border: 1px solid rgba(138, 180, 248, 0.2);
-        }
-
-        .nav-group { flex: 1; padding: 0 12px; }
-
-        .nav-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px; border-radius: 8px;
-            cursor: pointer; color: #9aa0a6;
-            transition: 0.2s; font-size: 0.9rem;
-        }
-
-        .nav-item:hover { background: rgba(255,255,255,0.04); color: #fff; }
-
-        /* --- MAIN WORKSPACE --- */
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        #chat-flow {
-            flex: 1;
-            padding: 40px 10%;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-        }
-
-        .message {
-            max-width: 800px;
-            margin-bottom: 32px;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } }
-
-        .ai-identity {
-            display: flex; align-items: center; gap: 8px;
-            font-weight: 500; margin-bottom: 8px;
-            background: var(--gemini-aura);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
-        /* --- 2028-LEVEL FLOATING INPUT --- */
-        .input-nexus {
-            padding: 20px 10% 40px;
-            background: linear-gradient(transparent, #0b0d11 40%);
-        }
-
-        .pill-box {
-            background: var(--google-gray-800);
-            border: 1px solid var(--border);
-            border-radius: 32px;
-            padding: 10px 24px;
-            display: flex; align-items: center; gap: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-
-        input {
-            flex: 1; background: none; border: none; color: white;
-            font-size: 1rem; outline: none; padding: 10px 0;
-        }
-
-        .agentic-toggle {
-            font-size: 0.7rem; padding: 4px 12px;
-            border: 1px solid #3c4043; border-radius: 20px;
-            cursor: pointer; color: #9aa0a6;
-        }
-
-        .agentic-toggle.active {
-            border-color: #8ab4f8; color: #8ab4f8;
-            background: rgba(138, 180, 248, 0.1);
-        }
-
-        /* SETTINGS OVERLAY */
-        #settings-ui {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            display: none; justify-content: center; align-items: center; z-index: 1000;
-        }
-
-        .settings-card {
-            background: #1e1f20; width: 450px; padding: 40px;
-            border-radius: 28px; border: 1px solid var(--border);
-        }
-    </style>
+<style>
+body{ margin:0; background:#0b0f14; color:#eaeaea; font-family:Inter,sans-serif; display:flex; height:100vh;}
+.sidebar{ width:260px; background:#11161c; padding:20px; display:flex; flex-direction:column; border-right:1px solid rgba(255,255,255,0.05);}
+.sidebar h2{ margin:0 0 20px; }
+.sidebar button{ background:#1b232d; border:none; color:white; padding:10px; margin-bottom:10px; border-radius:8px; cursor:pointer;}
+.sidebar button:hover{ background:#243041; }
+.main{ flex:1; display:flex; flex-direction:column; }
+.chat{ flex:1; overflow-y:auto; padding:30px; }
+.message{ margin-bottom:20px; line-height:1.6; white-space:pre-wrap; }
+.user{ color:#9aa0a6; text-align:right; }
+.ai{ color:#6bbcff; }
+.input-area{ padding:20px; border-top:1px solid rgba(255,255,255,0.05);}
+.input-box{ display:flex; background:#1b232d; border-radius:30px; padding:10px 20px;}
+input{ flex:1; background:none; border:none; color:white; font-size:16px; outline:none;}
+button.send{ background:#2979ff; border:none; color:white; padding:8px 15px; border-radius:20px; cursor:pointer;}
+button.send:hover{ background:#3a86ff; }
+</style>
 </head>
+
 <body>
+<div class="sidebar">
+  <h2>Neural AGI v3</h2>
+  <button onclick="newChat()">New Chat</button>
+  <button onclick="toggleAgent()">Toggle Agent</button>
+  <button onclick="toggleReflection()">Toggle Reflection</button>
+  <button onclick="toggleStreaming()">Toggle Streaming</button>
+  <button onclick="openSettings()">API / Model</button>
+</div>
 
-<aside id="gemini-sidebar">
-    <div class="sidebar-header">
-        <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d473530c273ad91746f33.svg" class="gemini-logo">
-        <span style="font-weight: 500; font-size: 1.1rem;">Gemini</span>
+<div class="main">
+  <div id="chat" class="chat"></div>
+  <div class="input-area">
+    <div class="input-box">
+      <input id="input" placeholder="Engage Neural Core..." />
+      <button class="send" onclick="send()">Send</button>
     </div>
-
-    <div class="workspace-status">
-        <strong>Personal Intelligence Active</strong><br>
-        <span style="opacity: 0.7;">Synced with Gmail, Drive, & Calendar</span>
-    </div>
-
-    <div class="nav-group">
-        <div class="nav-item">◈ Knowledge Graph</div>
-        <div class="nav-item">◈ Agentic Sub-logs</div>
-        <div class="nav-item">◈ Research Threads</div>
-        <div class="nav-item" onclick="toggleSettings()">◈ System Config</div>
-    </div>
-</aside>
-
-<main>
-    <div id="chat-flow">
-        <div class="message">
-            <div class="ai-identity">Gemini 3 Pro</div>
-            Welcome to your 2026 Neural Environment. I've initialized my background agentic nodes to monitor your workspace context. How can we optimize your workflow today?
-        </div>
-    </div>
-
-    <div class="input-nexus">
-        <div class="pill-box">
-            <button style="background:none; border:none; color:#9aa0a6; cursor:pointer; font-size: 1.2rem;">⊕</button>
-            <input type="text" id="nexus-in" placeholder="Ask Gemini..." autocomplete="off">
-            <div class="agentic-toggle" id="at-toggle" onclick="this.classList.toggle('active')">Agentic Mode</div>
-            <button class="icon-btn" style="background:none; border:none; cursor:pointer;" onclick="toggleSettings()">⚙</button>
-        </div>
-    </div>
-</main>
-
-<div id="settings-ui">
-    <div class="settings-card">
-        <h3 style="margin-top: 0;">2026 Neural Configuration</h3>
-        <p style="font-size: 0.8rem; color: #9aa0a6;">Adjust the cognitive weight and processing depth of the active model.</p>
-        
-        <div style="margin: 20px 0;">
-            <label style="font-size: 0.7rem; color: #8ab4f8;">COGNITIVE LAYERS</label>
-            <input type="range" style="width:100%; margin-top:10px;">
-        </div>
-
-        <div style="margin: 20px 0;">
-            <label style="font-size: 0.7rem; color: #8ab4f8;">AUTONOMOUS AGENCY</label>
-            <input type="range" style="width:100%; margin-top:10px;">
-        </div>
-
-        <button onclick="toggleSettings()" style="width:100%; padding:14px; background:var(--google-blue); border:none; color:white; border-radius:12px; font-weight:bold; cursor:pointer;">Apply Neural Sync</button>
-    </div>
+  </div>
 </div>
 
 <script>
-    const chat = document.getElementById('chat-flow');
-    const input = document.getElementById('nexus-in');
-    const settings = document.getElementById('settings-ui');
+let apiKey = localStorage.getItem("apiKey");
+let model = localStorage.getItem("model") || "openai/gpt-4o-mini";
+let agentMode = true;
+let reflectionMode = true;
+let streamingMode = true;
+let memory = JSON.parse(localStorage.getItem("memory") || "[]");
 
-    function toggleSettings() {
-        settings.style.display = settings.style.display === 'flex' ? 'none' : 'flex';
+function saveMemory(){ localStorage.setItem("memory", JSON.stringify(memory)); }
+function openSettings(){
+  const newKey = prompt("Enter OpenRouter API Key:", apiKey||"");
+  const newModel = prompt("Enter Model:", model);
+  if(newKey){ apiKey=newKey; localStorage.setItem("apiKey",apiKey); }
+  if(newModel){ model=newModel; localStorage.setItem("model",model); }
+}
+if(!apiKey){ openSettings(); }
+
+function toggleAgent(){ agentMode=!agentMode; alert("Agent: "+(agentMode?"ON":"OFF")); }
+function toggleReflection(){ reflectionMode=!reflectionMode; alert("Reflection: "+(reflectionMode?"ON":"OFF")); }
+function toggleStreaming(){ streamingMode=!streamingMode; alert("Streaming: "+(streamingMode?"ON":"OFF")); }
+function newChat(){ document.getElementById("chat").innerHTML=""; memory=[]; saveMemory(); }
+
+function addMessage(html,type){
+  const div=document.createElement("div");
+  div.className="message "+type;
+  div.innerHTML=marked.parse(html);
+  document.getElementById("chat").appendChild(div);
+  Prism.highlightAll();
+  document.getElementById("chat").scrollTop=document.getElementById("chat").scrollHeight;
+  return div;
+}
+
+async function callModel(messages,stream=false){
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions",{
+    method:"POST",
+    headers:{ "Authorization":"Bearer "+apiKey, "Content-Type":"application/json" },
+    body:JSON.stringify({ model:model, messages:messages, temperature:0.7, stream:stream })
+  });
+  if(!response.ok) throw new Error("API Error");
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+async function send(){
+  const input=document.getElementById("input");
+  const text=input.value.trim();
+  if(!text || !apiKey) return;
+  input.value="";
+  addMessage(text,"user");
+  memory.push({role:"user",content:text});
+  saveMemory();
+  const aiDiv=addMessage("Thinking...","ai");
+
+  try{
+    let systemPrompt = "You are a futuristic multi-agent AI. Plan, reason, and solve tasks step-by-step.";
+
+    if(agentMode){ systemPrompt+=" Internal planner active."; }
+    let messages=[{role:"system",content:systemPrompt}, ...memory];
+
+    // Main response
+    let reply = await callModel(messages, streamingMode);
+
+    // Reflection loop
+    if(reflectionMode){
+      reply = await callModel([
+        {role:"system",content:"Reflect and improve the following answer for clarity and depth."},
+        {role:"user",content:reply}
+      ]);
     }
 
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && input.value.trim() !== "") {
-            handleInput(input.value);
-            input.value = "";
-        }
-    });
+    aiDiv.innerHTML = marked.parse(reply);
+    Prism.highlightAll();
+    memory.push({role:"assistant",content:reply});
+    saveMemory();
 
-    function handleInput(text) {
-        const u = document.createElement('div');
-        u.className = 'message';
-        u.style.textAlign = 'right';
-        u.style.color = '#9aa0a6';
-        u.innerHTML = text;
-        chat.appendChild(u);
+  }catch(err){ aiDiv.textContent="Error: "+err.message; }
+}
 
-        const ai = document.createElement('div');
-        ai.className = 'message';
-        ai.innerHTML = `<div class="ai-identity">Gemini 3 Pro</div><span style="color:#8ab4f8">Synthesizing through agentic clusters...</span>`;
-        chat.appendChild(ai);
-        chat.scrollTop = chat.scrollHeight;
+document.getElementById("input").addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
 
-        setTimeout(() => {
-            ai.innerHTML = `<div class="ai-identity">Gemini 3 Pro</div>Using **Agentic Vision**, I have analyzed the context of "${text}". I have cross-referenced your Gmail threads and found a conflict in the Q1 timeline. Should I deploy a sub-agent to draft a correction?`;
-            chat.scrollTop = chat.scrollHeight;
-        }, 1200);
-    }
+// Render old memory on load
+memory.forEach(msg=>{ addMessage(msg.content,msg.role==="user"?"user":"ai"); });
 </script>
-
 </body>
 </html>
