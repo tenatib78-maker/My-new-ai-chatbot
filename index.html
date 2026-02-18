@@ -3,235 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gomma AI – Advanced Interface</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,fill,GRAD@24,400,0,0" />
+    <title>Gemini | Official 2026 Workspace</title>
     <style>
         :root {
-            --sidebar-bg: #1e1f20;
-            --main-bg: #131314;
-            --text-main: #e3e3e3;
-            --accent: #8ab4f8;
-            --user-bubble: #2b2c2f;
-            --hover-bg: rgba(255, 255, 255, 0.08);
+            --google-gray-900: #131314;
+            --google-gray-800: #1e1f20;
+            --google-blue: #1a73e8;
+            --gemini-aura: linear-gradient(135deg, #4285f4, #9b72cb, #d96570);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        .light-mode {
-            --sidebar-bg: #f0f2f5;
-            --main-bg: #ffffff;
-            --text-main: #1f1f1f;
-            --accent: #1a73e8;
-            --user-bubble: #e9eef6;
-            --hover-bg: rgba(0, 0, 0, 0.05);
+        body, html {
+            margin: 0; padding: 0;
+            background: #0b0d11;
+            color: #e3e3e3;
+            font-family: 'Google Sans', 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
         }
 
-        body {
-            margin: 0; font-family: 'Google Sans', 'Segoe UI', sans-serif;
-            background: var(--main-bg); color: var(--text-main);
-            display: flex; height: 100vh; overflow: hidden; transition: 0.3s;
+        /* --- OFFICIAL 2026 SIDEBAR --- */
+        aside#gemini-sidebar {
+            width: 300px;
+            background: var(--google-gray-900);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        /* Sidebar Styling */
-        #sidebar {
-            width: 280px; background: var(--sidebar-bg);
-            height: 100%; display: flex; flex-direction: column;
-            transition: 0.3s ease; flex-shrink: 0;
-        }
-
-        .sidebar-hidden #sidebar { margin-left: -280px; }
 
         .sidebar-header {
-            padding: 20px; font-size: 1.4rem; font-weight: 500;
-            display: flex; align-items: center; gap: 10px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .nav-list { flex: 1; padding: 10px; overflow-y: auto; }
+        .gemini-logo {
+            width: 24px;
+            filter: drop-shadow(0 0 5px rgba(66, 133, 244, 0.5));
+        }
+
+        .workspace-status {
+            margin: 0 20px 20px;
+            padding: 12px;
+            background: rgba(138, 180, 248, 0.08);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #8ab4f8;
+            border: 1px solid rgba(138, 180, 248, 0.2);
+        }
+
+        .nav-group { flex: 1; padding: 0 12px; }
 
         .nav-item {
-            padding: 12px 16px; cursor: pointer; display: flex; align-items: center;
-            gap: 12px; border-radius: 25px; transition: 0.2s;
-            font-size: 0.95rem; margin-bottom: 4px;
-        }
-        .nav-item:hover { background: var(--hover-bg); }
-        .nav-item i { font-size: 20px; }
-
-        .sidebar-footer { padding: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
-
-        /* Main Area */
-        #main-content { flex: 1; display: flex; flex-direction: column; position: relative; }
-
-        .top-nav { padding: 10px 20px; display: flex; align-items: center; gap: 15px; }
-
-        .chat-window {
-            flex: 1; overflow-y: auto; padding: 20px 15% 150px 15%;
-            display: flex; flex-direction: column; gap: 40px;
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px; border-radius: 8px;
+            cursor: pointer; color: #9aa0a6;
+            transition: 0.2s; font-size: 0.9rem;
         }
 
-        .user-row { align-self: flex-end; max-width: 85%; }
-        .user-bubble { background: var(--user-bubble); padding: 15px 20px; border-radius: 22px; }
+        .nav-item:hover { background: rgba(255,255,255,0.04); color: #fff; }
 
-        .ai-row { align-self: flex-start; width: 100%; display: flex; gap: 15px; }
-        .ai-content { flex: 1; line-height: 1.7; }
-
-        /* Settings Icon Specifics */
-        .settings-trigger {
-            cursor: pointer; display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; border-radius: 25px; width: 100%;
-            background: none; border: none; color: inherit; font-size: inherit;
+        /* --- MAIN WORKSPACE --- */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
-        .settings-trigger:hover { background: var(--hover-bg); }
 
-        /* Input Bar */
-        .input-container {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 80%; max-width: 760px; background: var(--user-bubble);
-            border-radius: 32px; padding: 8px 20px; display: flex; align-items: center;
+        #chat-flow {
+            flex: 1;
+            padding: 40px 10%;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 800px;
+            margin-bottom: 32px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } }
+
+        .ai-identity {
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 500; margin-bottom: 8px;
+            background: var(--gemini-aura);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* --- 2028-LEVEL FLOATING INPUT --- */
+        .input-nexus {
+            padding: 20px 10% 40px;
+            background: linear-gradient(transparent, #0b0d11 40%);
+        }
+
+        .pill-box {
+            background: var(--google-gray-800);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 10px 24px;
+            display: flex; align-items: center; gap: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
 
         input {
-            flex: 1; background: transparent; border: none; color: inherit;
-            padding: 12px; outline: none; font-size: 1rem;
+            flex: 1; background: none; border: none; color: white;
+            font-size: 1rem; outline: none; padding: 10px 0;
         }
 
-        /* Modal */
-        #settingsModal {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: var(--sidebar-bg); border: 1px solid #444;
-            padding: 25px; border-radius: 20px; z-index: 1000; display: none; width: 320px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        .agentic-toggle {
+            font-size: 0.7rem; padding: 4px 12px;
+            border: 1px solid #3c4043; border-radius: 20px;
+            cursor: pointer; color: #9aa0a6;
+        }
+
+        .agentic-toggle.active {
+            border-color: #8ab4f8; color: #8ab4f8;
+            background: rgba(138, 180, 248, 0.1);
+        }
+
+        /* SETTINGS OVERLAY */
+        #settings-ui {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+
+        .settings-card {
+            background: #1e1f20; width: 450px; padding: 40px;
+            border-radius: 28px; border: 1px solid var(--border);
         }
     </style>
 </head>
-<body class="sidebar-visible">
+<body>
 
-<div id="sidebar">
+<aside id="gemini-sidebar">
     <div class="sidebar-header">
-        <span class="material-symbols-rounded">rocket_launch</span> Gomma AI
-    </div>
-    
-    <div class="nav-list">
-        <div class="nav-item" onclick="resetChat()">
-            <span class="material-symbols-rounded">add</span> New Chat
-        </div>
-        <div style="margin-top: 20px; padding: 0 16px; opacity: 0.5; font-size: 0.75rem; text-transform: uppercase;">Recent</div>
-        <div class="nav-item"><span class="material-symbols-rounded">chat_bubble</span> Project Brainstorm</div>
+        <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d473530c273ad91746f33.svg" class="gemini-logo">
+        <span style="font-weight: 500; font-size: 1.1rem;">Gemini</span>
     </div>
 
-    <div class="sidebar-footer">
-        <button class="settings-trigger" onclick="toggleModal()">
-            <span class="material-symbols-rounded">settings</span> Settings
-        </button>
-    </div>
-</div>
-
-<div id="main-content">
-    <div class="top-nav">
-        <button onclick="document.body.classList.toggle('sidebar-hidden')" style="background:none; border:none; color:inherit; cursor:pointer;">
-            <span class="material-symbols-rounded">menu</span>
-        </button>
-        <div id="activeBotName" style="font-weight: 500;">Gomma Pro</div>
+    <div class="workspace-status">
+        <strong>Personal Intelligence Active</strong><br>
+        <span style="opacity: 0.7;">Synced with Gmail, Drive, & Calendar</span>
     </div>
 
-    <div class="chat-window" id="chatBox">
-        <div class="ai-row">
-            <span class="material-symbols-rounded" style="color:var(--accent)">smart_toy</span>
-            <div class="ai-content">Ready for your next request. What shall we build together?</div>
+    <div class="nav-group">
+        <div class="nav-item">◈ Knowledge Graph</div>
+        <div class="nav-item">◈ Agentic Sub-logs</div>
+        <div class="nav-item">◈ Research Threads</div>
+        <div class="nav-item" onclick="toggleSettings()">◈ System Config</div>
+    </div>
+</aside>
+
+<main>
+    <div id="chat-flow">
+        <div class="message">
+            <div class="ai-identity">Gemini 3 Pro</div>
+            Welcome to your 2026 Neural Environment. I've initialized my background agentic nodes to monitor your workspace context. How can we optimize your workflow today?
         </div>
     </div>
 
-    <div class="input-container">
-        <input type="text" id="userInput" placeholder="Message Gomma...">
-        <button onclick="askGomma()" style="background:none; border:none; color:var(--accent); cursor:pointer;">
-            <span class="material-symbols-rounded">send</span>
-        </button>
+    <div class="input-nexus">
+        <div class="pill-box">
+            <button style="background:none; border:none; color:#9aa0a6; cursor:pointer; font-size: 1.2rem;">⊕</button>
+            <input type="text" id="nexus-in" placeholder="Ask Gemini..." autocomplete="off">
+            <div class="agentic-toggle" id="at-toggle" onclick="this.classList.toggle('active')">Agentic Mode</div>
+            <button class="icon-btn" style="background:none; border:none; cursor:pointer;" onclick="toggleSettings()">⚙</button>
+        </div>
     </div>
-</div>
+</main>
 
-<div id="settingsModal">
-    <h3 style="margin-top:0">Settings</h3>
-    <p>Display Name</p>
-    <input type="text" id="nameInput" style="width:90%; padding:10px; background:#000; border:1px solid #444; color:white; border-radius:8px;">
-    
-    <p>Theme</p>
-    <select id="themeInput" style="width:100%; padding:10px; border-radius:8px;">
-        <option value="dark">Dark Theme</option>
-        <option value="light">Light Theme</option>
-    </select>
-    
-    <button onclick="saveSettings()" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:10px; margin-top:20px; cursor:pointer; font-weight:bold;">Save Changes</button>
-    <button onclick="toggleModal()" style="width:100%; padding:12px; background:transparent; color:white; border:none; cursor:pointer;">Cancel</button>
+<div id="settings-ui">
+    <div class="settings-card">
+        <h3 style="margin-top: 0;">2026 Neural Configuration</h3>
+        <p style="font-size: 0.8rem; color: #9aa0a6;">Adjust the cognitive weight and processing depth of the active model.</p>
+        
+        <div style="margin: 20px 0;">
+            <label style="font-size: 0.7rem; color: #8ab4f8;">COGNITIVE LAYERS</label>
+            <input type="range" style="width:100%; margin-top:10px;">
+        </div>
+
+        <div style="margin: 20px 0;">
+            <label style="font-size: 0.7rem; color: #8ab4f8;">AUTONOMOUS AGENCY</label>
+            <input type="range" style="width:100%; margin-top:10px;">
+        </div>
+
+        <button onclick="toggleSettings()" style="width:100%; padding:14px; background:var(--google-blue); border:none; color:white; border-radius:12px; font-weight:bold; cursor:pointer;">Apply Neural Sync</button>
+    </div>
 </div>
 
 <script>
-    const API_KEY = "YOUR_GEMINI_API_KEY_HERE";
-    let history = [];
-    let config = JSON.parse(localStorage.getItem('gomma_v3')) || { name: "Gomma Pro", theme: "dark" };
+    const chat = document.getElementById('chat-flow');
+    const input = document.getElementById('nexus-in');
+    const settings = document.getElementById('settings-ui');
 
-    function applyConfig() {
-        document.getElementById('activeBotName').innerText = config.name;
-        document.body.className = config.theme === 'light' ? 'light-mode' : '';
-        document.getElementById('nameInput').value = config.name;
-        document.getElementById('themeInput').value = config.theme;
+    function toggleSettings() {
+        settings.style.display = settings.style.display === 'flex' ? 'none' : 'flex';
     }
 
-    async function askGomma() {
-        const text = document.getElementById('userInput').value.trim();
-        if (!text || API_KEY.includes("YOUR")) return;
-
-        appendMsg(text, 'user');
-        document.getElementById('userInput').value = "";
-        history.push({ role: "user", parts: [{ text: text }] });
-
-        try {
-            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: history })
-            });
-            const data = await resp.json();
-            const aiText = data.candidates[0].content.parts[0].text;
-            
-            history.push({ role: "model", parts: [{ text: aiText }] });
-            appendMsg(aiText, 'ai');
-        } catch (e) {
-            appendMsg("Connection error. Check API settings.", "ai");
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && input.value.trim() !== "") {
+            handleInput(input.value);
+            input.value = "";
         }
-    }
+    });
 
-    function appendMsg(text, type) {
-        const chatBox = document.getElementById('chatBox');
-        const div = document.createElement('div');
-        div.className = type === 'user' ? 'user-row' : 'ai-row';
-        
-        const content = type === 'user' ? 
-            `<div class="user-bubble">${text}</div>` : 
-            `<span class="material-symbols-rounded" style="color:var(--accent)">smart_toy</span><div class="ai-content">${marked.parse(text)}</div>`;
-        
-        div.innerHTML = content;
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    function handleInput(text) {
+        const u = document.createElement('div');
+        u.className = 'message';
+        u.style.textAlign = 'right';
+        u.style.color = '#9aa0a6';
+        u.innerHTML = text;
+        chat.appendChild(u);
 
-    function toggleModal() {
-        const m = document.getElementById('settingsModal');
-        m.style.display = m.style.display === 'block' ? 'none' : 'block';
-    }
+        const ai = document.createElement('div');
+        ai.className = 'message';
+        ai.innerHTML = `<div class="ai-identity">Gemini 3 Pro</div><span style="color:#8ab4f8">Synthesizing through agentic clusters...</span>`;
+        chat.appendChild(ai);
+        chat.scrollTop = chat.scrollHeight;
 
-    function saveSettings() {
-        config.name = document.getElementById('nameInput').value;
-        config.theme = document.getElementById('themeInput').value;
-        localStorage.setItem('gomma_v3', JSON.stringify(config));
-        applyConfig();
-        toggleModal();
+        setTimeout(() => {
+            ai.innerHTML = `<div class="ai-identity">Gemini 3 Pro</div>Using **Agentic Vision**, I have analyzed the context of "${text}". I have cross-referenced your Gmail threads and found a conflict in the Q1 timeline. Should I deploy a sub-agent to draft a correction?`;
+            chat.scrollTop = chat.scrollHeight;
+        }, 1200);
     }
-
-    function resetChat() {
-        history = [];
-        document.getElementById('chatBox').innerHTML = `<div class="ai-row"><span class="material-symbols-rounded" style="color:var(--accent)">smart_toy</span><div class="ai-content">Chat reset. New session started.</div></div>`;
-    }
-
-    document.getElementById('userInput').addEventListener('keypress', e => { if(e.key === 'Enter') askGomma() });
-    applyConfig();
 </script>
 
 </body>
